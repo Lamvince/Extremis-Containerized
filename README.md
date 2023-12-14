@@ -13,6 +13,8 @@
 EXTREMIS
 
 ## Description
+Extremis-Containerized is a project to redeploy the original [Extremis](https://github.com/Lamvince/Extremis) webapp using Docker, Kuberntes and AWS. The original repository will serve as an archive, so that the hard work of team Burnaby-15 can remain untocuhed.
+
 Our team BBY15 is developing Extremis to help people keep track of extreme weather conditions to protect themselves and their properties 
 by following real-time weather conditions and by sharing their current situations.
 	
@@ -33,7 +35,7 @@ This Extremis app is made possible because of amazing people that created:
 Thank you for making these resources free so it's possible for us to create applications with ease!
 
 ## Overview
-- The link for our project: [Extremis](https://extremis-bby15.herokuapp.com) for our amazing website
+- The link for our project: [Extremis](https://extremis-app.herokuapp.com) for our amazing website
 - What did we made?
     We developed Extremis, a web app designed to tackle numerous extreme weather conditions safely and efficiently.
     Our webapp can access or provide information on current weather conditions. 
