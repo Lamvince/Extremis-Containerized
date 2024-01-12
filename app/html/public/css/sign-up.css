@@ -1,0 +1,144 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap%27');
+
+body {
+  background-image: url("../assets/background-web-rain.jpg");
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+  font-family: 'Montserrat';
+  margin: 0;
+}
+
+#logo {
+  width: 15%;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#container {
+  text-align: center;
+  margin:auto;
+  width:40%;
+  padding:10px;
+  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+
+#signUpForm {
+  margin: 5% 20% auto 20%;
+}
+
+.errorMsg {
+  color: red;
+  margin: 0 0 20px 0;
+}
+
+input {
+  display: block;
+  width: 100%;
+  border-radius: 15px;
+  border: solid 0.5px #484848;
+  font-size: 15px;
+  margin-top: 10px;
+  padding-left: 10px;
+  height: 35px;
+  font-family: 'Montserrat';
+}
+
+#signUpForm {
+  color: #40403e;
+}
+
+#signUpForm>input[type="button"] {
+  width: 50%;
+  margin: 30px auto 20px auto;
+  cursor: pointer;
+  background-color: #3477f9;
+  color: #ffffff;
+  font-size: 15px;
+  border-color: transparent;
+}
+
+.label {
+  font-size: 15px;
+  float: left;
+}
+
+.togglePassword {
+  position: absolute;
+  margin-top: -25px; 
+  margin-left: 10%;
+  cursor: pointer;
+}
+
+#signUpTitle {
+  color: #3477f9;
+  font-weight: bold;
+  text-align: center;
+}
+
+#signUpForm>input[type="button"]:hover {
+  color: white;
+  border-color: white;
+  opacity: 0.7;
+}
+
+#text {
+  text-align: center;
+}
+
+#log-in-link {
+  text-decoration: none;
+  color: #3477f9;
+  font-weight: 600;
+}
+
+footer {
+  color: black;
+  margin-top: 30px;
+  margin-bottom: 0px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.wrong_pass_alert {
+  text-align: center;
+}
+
+/*For the view under 800px*/
+@media (max-width: 800px) {
+  #signUpForm{
+    width: 70%;
+    margin: 0 auto;
+  }
+  
+  #signUpForm>input[type="button"] {
+    width: 100%;
+    margin: 10px auto;
+  }
+
+  #container {
+    text-align: center;
+    margin:auto;
+    width:90%;
+    padding:10px;
+    box-shadow: none;
+  }
+
+  #logo {
+    width:35%;
+  }
+
+  .togglePassword {
+    margin-left: 27%;
+}
+
+#signUpForm>input[type="button"] {
+  width: 70%;
+  margin-top:20px;
+}
+
+#log-in-link{
+  display: block;
+}
+}

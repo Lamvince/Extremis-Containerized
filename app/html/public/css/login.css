@@ -1,0 +1,202 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap%27');
+
+body{
+    background-image: url("../assets/background-web-rain.jpg");
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    font-family: 'Montserrat';
+    font-size: 15px;
+}
+
+#container {
+    display: grid;
+    grid-template-columns: 50% 50%;
+    grid-template-rows: 100%;
+    background-color: #ffffff;
+    height: 50vh;
+    margin: 25vh auto 0 auto;
+    width: 56vw;
+    text-align: center;
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+
+#left {
+    grid-row: 1;
+    grid-column: 1;
+    background-color: #3477f9;
+    height: inherit;
+}
+
+#logo1, #logo2 {
+    width: 50%;
+    margin-top: 10%;
+
+}
+
+#logo2{
+    display: none
+}
+
+h2{
+    text-align: center;
+    font-size: 25px;
+    color: #ffffff;
+}
+
+ p {
+     color: #ffffff;
+ }
+
+.sign-up-link{
+    font-family: 'Montserrat';
+    cursor: pointer;
+    background-color: #3477f9;
+    color: #ffffff;
+    font-size: 15px;
+    border: 0.5px solid #ffffff;
+    border-radius: 10px;
+    width: 35%;
+    line-height: 35px;
+    font-weight: bold;
+}
+
+.sign-up-link:hover{
+    box-shadow: 0 0 5px #ffffff;    
+}
+
+#loginForm {
+    grid-column: 2;
+    grid-row: 1;
+    margin: auto 10% auto 10%;
+}
+
+label, i {
+    float: left;
+    margin-bottom: 5px;
+}
+
+i{
+    margin-right: 5px;
+}
+input{
+    display: block;
+    width: 95%;
+    border-radius: 15px;
+    outline: solid 0.5px #484848;
+    font-size: 15px;
+    margin-top: 10px;
+    padding-left: 10px;
+    height: 40px;
+    font-family: 'Montserrat';
+    border: none;
+}
+
+input:hover{
+    outline: solid 1px #3477f9;
+    text-transform: none;
+}
+
+.errorMsg{
+    color: red;
+    margin: 0 0 20px 0;
+}
+
+#submit{
+    width: 50%;
+    margin: 30px auto 20px auto;
+    cursor: pointer;
+    background-color: #3477f9;
+    color: #ffffff;
+    font-size: 17px;
+    outline: transparent;
+    font-weight: 500;
+}
+
+#submit:hover{
+    box-shadow: 0 0 5px #3477F9;
+}
+
+#togglePassword {
+    position: absolute;
+    margin-top: -28px; 
+    margin-left: 9%;
+    cursor: pointer;
+}
+
+#sign-up2 {
+    display: none;
+}
+
+footer {
+    position:fixed;
+    left:0;
+    bottom:0;
+    width:100%;
+    text-align: center;
+    color: #000;
+}
+
+/*For the view under 800px*/
+@media (max-width: 800px) {
+    #container {
+        display: grid;
+        grid-template-columns: 100%;
+        grid-template-rows: 40% 60%;
+        text-align: center;
+        width: 90vw;
+        height: fit-content;
+        margin-top: 10vh;
+        box-shadow: none;
+    }
+
+    #left {
+        grid-column: 1;
+        grid-row: 1;
+        height: max-content;
+        background-color: #ffffff;
+    }
+
+    #logo1{
+        display: none;
+    }
+
+    #logo2 {
+        margin-top: 10px;
+        display: inline;
+    }
+
+    h2{
+        color: #3477f9;
+    }
+    #sign-up1 {
+        display: none;
+    }
+
+    #loginForm {
+        grid-column: 1;
+        grid-row: 2;
+        text-align: left;
+    }
+
+    #togglePassword {
+        margin-left: 65%;
+    }
+
+    #sign-up2 {
+        display: inherit;
+        text-align: center;
+    }
+
+    #sign-up2 p {
+        color: #000;
+        margin-bottom: 0;
+    }
+
+    #sign-up2 a {
+        color: #3477f9;
+        background-color: #ffffff;
+        text-decoration: none;
+        font-weight: 600;
+    }
+}

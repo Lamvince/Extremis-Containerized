@@ -1,0 +1,452 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800;900&display=swap%27');
+
+body {
+    font-family: 'Montserrat';
+    font-size: 18px;
+}
+
+.navbar {
+    display: flex;
+    position: relative;
+    justify-content: space-between;
+    align-items: center;
+    color: black;
+    text-decoration: solid;
+}
+
+.brand-title {
+    font-size: 1.5rem;
+    margin: .5rem;
+    color: #3477F9;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.navbar-links {
+    height: 100%;
+    margin-right: 15px;
+}
+
+.navbar-links ul {
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar-links li {
+    list-style: none;
+    padding-top: 10px;
+}
+
+.navbar-links li a {
+    display: block;
+    text-decoration: none;
+    color: black;
+    padding: 1rem;
+    font-size: 16px;
+    letter-spacing: 1.5px;
+    transition: all 0.3s ease 0s;
+}
+
+.navbar-links li a:hover {
+    color: rgba(52, 119, 249, 1.5);
+}
+
+
+.toggle-button {
+    position: absolute;
+    top: .75rem;
+    right: 1rem;
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 30px;
+    height: 21px;
+}
+
+.toggle-button .bar {
+    height: 3px;
+    width: 100%;
+    background-color: black;
+    border-radius: 10px;
+}
+
+.singin {
+    margin-top: 8px;
+    padding: 9px 25px;
+    background-color: rgba(52, 119, 249, 0.7);
+    border: none;
+    border-radius: 50px;
+    font-size: 16px;
+    cursor: pointer;
+    color: white;
+    transition: all 0.3s ease 0s;
+    letter-spacing: 1.5px;
+}
+
+button:hover {
+    background-color: rgba(52, 119, 249, 0.3);
+}
+
+.main-button {
+    margin-top: 2rem;
+}
+
+.um-subtitle {
+    font-weight: 500;
+    letter-spacing: 0.5rem;
+    font-size: 15px;
+}
+
+.branch {
+    font-size: 5rem;
+    font-weight: 700;
+}
+
+.container {
+    padding: 0;
+    text-align: center;
+}
+
+.createPost {
+    display: inline-block;
+    padding: 15px 15px;
+    font-size: 24px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color: #fff;
+    background-color: rgba(52, 119, 249, 0.9);
+    border: none;
+    border-radius: 15px;
+
+}
+
+.createPost:hover {
+    background-color: rgba(52, 119, 249, 0.7);
+}
+
+.forecastButton {
+    display: inline-block;
+    padding: 15px 15px;
+    font-size: 24px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    color: black;
+    background-color: bisque;
+    border: none;
+    border-radius: 15px;
+    margin-left: 20px;
+    border: 2px solid #3477F9;
+}
+
+.forecastButton:hover {
+    background-color: rgba(52, 119, 249, 0.7);
+}
+
+.howitwork {
+    font-size: 20px;
+    word-spacing: 2px;
+}
+
+h1 {
+    color: #3477f9;
+    text-align: center;
+    width: 100%;
+}
+
+h3 {
+    color: #3477f9;
+}
+
+.errorMsg {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    margin: 0 0 20px 0;
+}
+
+#user-container {
+    width: 100%;
+}
+
+.first_name, .last_name, .email, .password {
+    border-bottom: 0.3px solid black;
+}
+
+.material-icons {
+    float: right;
+}
+
+.user-list-button {
+    float: left;
+}
+
+.user-list-button:hover {
+    color: #3477f9;
+    cursor: pointer;
+}
+
+button {
+    padding: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    color: white;
+    background-color: rgba(52, 119, 249, 0.7);
+    border: none;
+    border-radius: 50px;
+}
+
+span{
+    cursor: pointer;
+}
+
+#reminder {
+    width: 130px;
+    background-color: #3477F9;
+    color:#ffffff;
+    right: 45%;
+    top:50%;
+    position: fixed;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 10px;
+    display: none;
+    font-size: 14px;
+}
+
+/* Popup message starts */
+#err-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.9);
+    height: 100%;
+    width: 100vw;
+    z-index: 100;
+    display: none;
+}
+
+#err-popup-container {
+    text-align: center;
+    width: 40%;
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border-radius: 15px;
+    padding: 10px 20px;
+}
+
+#err-popup-container img {
+    width: 100px;
+}
+
+#err-popup-container button {
+    width: 150px;
+    margin-left: 20px;
+    font-family: 'Montserrat', sans-serif;
+    height: 40px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+    border: none;
+}
+
+#cancel2 {
+    background-color: #3477F9;
+    color: #ffffff;
+}
+
+#confirm {
+    background-color: #c1c1c1;
+    color: #ffffff;
+}
+
+/* Popup message ends  */
+
+
+footer {
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    color: #000;
+}
+
+td {
+    text-align: center;
+}
+
+@media only screen and (max-width: 960px) {
+    body {
+        grid-template-columns: 5% 90% 5%;
+        font-size: 14px;
+        margin: 0;
+    }
+
+    .user-card {
+        width: 100%;
+    }
+
+    .brand-title {
+        text-decoration: solid;
+        font-size: 28px;
+        color: white;
+    }
+
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+        color: #000;
+        background-color: #5ca1dc;
+
+    }
+
+    .toggle-button {
+        display: flex;
+    }
+
+    .navbar-links {
+        display: none;
+        width: 100%;
+    }
+
+    .navbar-links ul {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .navbar-links ul li {
+        text-align: center;
+        font-size: 18px;
+
+    }
+
+    .navbar-links ul li a {
+        padding: 1rem 1rem;
+        color: #000;
+        font-size: 18px;
+
+    }
+
+    .navbar-links.active {
+        display: flex;
+        background-color: white;
+    }
+
+    .singin {
+        padding: 9px 30px;
+        background-color: rgba(52, 119, 249, 0.7);
+        border: none;
+        border-radius: 50px;
+        font-size: 18px;
+        cursor: pointer;
+        color: white;
+        transition: all 0.3s ease 0s;
+        margin-bottom: 30px;
+    }
+
+    /* Mobile Table */
+    #user-container {
+        margin: 0 auto 0 auto;
+        width: 90vw;
+    }
+
+    .branch {
+        font-size: 4rem;
+    }
+
+    .main-button {
+        margin-top: 1rem;
+    }
+
+    thead, tbody, th, table, td, tr {
+        display: block;
+    }
+
+    thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+    }
+
+    td {
+        border: none;
+        border-bottom: 1px solid #eee;
+        position: relative;
+        padding-left: 50%;
+        height: 25px;
+    }
+
+    td:before {
+        position: absolute;
+        left: 6px;
+        width: 45%;
+        padding-right: 10px;
+        white-space: nowrap;
+    }
+
+    .id {
+        background-color: #5ca1dc;
+        color: white;
+    }
+
+    td:nth-of-type(1):before {
+        content: "ID";
+    }
+
+    td:nth-of-type(2):before {
+        content: "First Name";
+    }
+
+    td:nth-of-type(3):before {
+        content: "Last Name";
+    }
+
+    td:nth-of-type(4):before {
+        content: "Email";
+    }
+
+    td:nth-of-type(5):before {
+        content: "Password";
+    }
+
+    td:nth-of-type(6):before {
+        content: "Role";
+    }
+
+    td:nth-of-type(7):before {
+        content: "Delete";
+    }
+
+    /* Mobile Table Ends*/
+
+    #err-popup-container {
+        width: 80%;
+        font-size: 13px;
+        line-height: 20px;
+        padding: 5px 10px;
+    }
+
+    #err-popup-container img {
+        width: 60px;
+    }
+
+    #err-popup-container h2 {
+        font-size: 20px;
+        margin: 0;
+    }
+
+    #err-popup-container button {
+        height: 30px;
+        margin-bottom: 10px;
+        font-size: 13px;
+        margin-left: 5px;
+        width: 120px;
+    }
+}
