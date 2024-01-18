@@ -84,7 +84,8 @@ async function sendData(data) {
             method: 'POST',
             headers: {
                 "Accept": 'application/json',
-                "Content-Type": 'application/json'
+                "Content-Type": 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify(data)
         });
@@ -93,9 +94,15 @@ async function sendData(data) {
             // Display error message if data of the post has not been stored into database
             document.getElementById("emptyError").innerHTML = "<small>*All required fields have to be filled*</small>";
         } else {
+            localStorage.setItem("token", parsedJSON.token);
             // Send data of images uploaded by users to the server later.
             let responseObject2 = await fetch("/api/upload-post-images", {
                 method: 'POST',
+                headers: {
+                    "Accept": 'application/json',
+                    "Content-Type": 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: formData
             });
             let parsedJSON2 = responseObject2.json();

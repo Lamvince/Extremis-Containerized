@@ -27,6 +27,11 @@ async function sendData(data) {
         } else if (parsedJSON.status == "invalid email") {
             document.getElementById("emptyError").innerHTML = "<small>*Invalid email address*</small>";
         } else {
+            // Store session token
+            const token = await parsedJSON.token;
+            localStorage.setItem("token", token);
+
+            // Redirect to home page
             window.location.replace("/main");
         }
     } catch (error) {}

@@ -25,6 +25,7 @@ async function sendData(data) {
             document.getElementById("emailError").innerHTML = "<small>*Please check your email</small>";
             document.getElementById("passwordError").innerHTML = "<small>*Please check your password</small>";
         } else {
+            // Store session token
             const token = await parsedJSON.token;
             localStorage.setItem("token", token);
 
@@ -45,7 +46,7 @@ async function sendData(data) {
  * @returns payload
  */
 function parseToken(token) {
-    // Implement token parsing logic here
+    // Token parsing logic
     const base64Url = token.split('.')[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     const payload = JSON.parse(atob(base64));

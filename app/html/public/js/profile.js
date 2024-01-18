@@ -1,5 +1,27 @@
 "use strict";
 
+// Gets the user's profile data and populate the page.
+document.addEventListener("DOMContentLoaded", function() {
+    const token = localStorage.getItem('token');
+
+    fetch('/api/profile', {
+        method: `GET`,
+        headers: {
+            "Accept": 'application/json',
+            "Content-Type": 'application/json',
+            'Authorization': `Bearer ${token}`
+        }
+    })
+    .then(response => response.text())
+    .then(data => {
+        document.querySelector('#user-content').innerHTML = data;
+    })
+    .catch(error => {
+        console.error('Error fetching data:', error);
+    });
+});
+
+
 /**
  * Send data from client side to server for authentication.
  * Otherwise, send an error message to user. 
@@ -12,7 +34,8 @@ async function sendData(data) {
             method: 'POST',
             headers: {
                 "Accept": 'application/json',
-                "Content-Type": 'application/json'
+                "Content-Type": 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify(data)
         });
@@ -23,6 +46,7 @@ async function sendData(data) {
             document.getElementById("emptyError").innerHTML = "<small>*Invalid email address*</small>";
         }
         else {
+            localStorage.setItem("token", parsedJSON.token);
             window.location.reload();
         }
     } catch (error) {}
@@ -62,11 +86,18 @@ function uploadImages(e) {
     e.preventDefault();
     const imagesUpload = document.querySelector("#selectFile");
     const formData = new FormData();
+    const token = localStorage.getItem("token");
+
     for (let i = 0; i < imagesUpload.files.length; i++) {
         formData.append("files", imagesUpload.files[i]);
     }
     const options = {
         method: 'POST',
+        headers: {
+            "Accept": 'application/json',
+            "Content-Type": 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
         body: formData,
     };
     fetch("/api/upload-avatar", options)

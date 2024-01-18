@@ -1,5 +1,19 @@
 "use strict";
 
+// Gets the user data of all users populates the page.
+document.addEventListener("DOMContentLoaded", function() {
+    fetch('/api/user-list')
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById("user-container").innerHTML = html;
+        })
+        .catch(error => {
+            console.error('Error fetching admin list:', error);
+        });
+});
+
+getList();
+
 /**
  * Sends the user data from the client side to the server side for authentication.
  * User clicks on the data that needs to be changed through the text box, and it changes on to the server side in real time

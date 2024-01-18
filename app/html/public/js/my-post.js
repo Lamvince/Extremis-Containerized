@@ -7,12 +7,22 @@
 
 "use strict";
 
-//Hamburger menu
-const toggleButton = document.getElementsByClassName('toggle-button')[0];
-const navbarLinks = document.getElementsByClassName('navbar-links')[0];
+// Populates with posts belonging to the user
+document.addEventListener("DOMContentLoaded", function() {
+    const token = localStorage.getItem('token');
 
-toggleButton.addEventListener('click', () => {
-    navbarLinks.classList.toggle('active');
+    fetch('/api/my-post', {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+    .then(response => response.text())
+    .then(data => {
+        document.querySelector('#my=post-content').innerHTML = data;
+    })
+    .catch(error => {
+        console.error('Error fetching data:', error);
+    });
 });
 
 //Send the update of texts on each post
@@ -22,7 +32,8 @@ async function sendData(data) {
             method: 'POST',
             headers: {
                 "Accept": 'application/json',
-                "Content-Type": 'application/json'
+                "Content-Type": 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify(data)
         });
@@ -111,7 +122,8 @@ async function sendContent(data) {
             method: 'POST',
             headers: {
                 "Accept": 'application/json',
-                "Content-Type": 'application/json'
+                "Content-Type": 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify(data)
         });
@@ -210,6 +222,11 @@ async function uploadImages(e) {
     }
     let options = {
         method: 'POST',
+        headers: {
+            "Accept": 'application/json',
+            "Content-Type": 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
         body: formData,
     };
     // now use fetch
@@ -231,12 +248,14 @@ async function sendDataToaddImage(e) {
             method: 'POST',
             headers: {
                 "Accept": 'application/json',
-                "Content-Type": 'application/json'
+                "Content-Type": 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify(dataToSend)
         });
         let parsedJSON = await responseObject.json();
         if (parsedJSON.status == "success") {
+            localStorage.setItem("token", parsedJSON.token);
             parent.parentNode.remove();
             window.location.replace("/my-post");
         }
