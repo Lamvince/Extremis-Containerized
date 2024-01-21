@@ -7,7 +7,7 @@
     email varchar(45) UNIQUE NOT NULL,
     user_password varchar(25) NOT NULL,
     profile_picture varchar(150),
-    admin_role boolean NOT NULL,
+    admin_role boolean NOT NULL DEFAULT FALSE,
     join_date datetime,
     num_posts int,
     PRIMARY KEY (user_id));

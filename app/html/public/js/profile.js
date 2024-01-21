@@ -1,5 +1,9 @@
 "use strict";
 
+let oldFirstName;
+let oldLastName;
+let oldPassword;
+
 // Gets the user's profile data and populate the page.
 document.addEventListener("DOMContentLoaded", function() {
     const token = localStorage.getItem('token');
@@ -13,8 +17,11 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     })
     .then(response => response.text())
-    .then(data => {
-        document.querySelector('#user-content').innerHTML = data;
+    .then(html => {
+        document.querySelector('#user_content').innerHTML += html;
+        oldFirstName = document.querySelector("#firstName").value;
+        oldLastName = document.querySelector("#lastName").value;
+        oldPassword = document.querySelector("#userPassword").value;
     })
     .catch(error => {
         console.error('Error fetching data:', error);
@@ -128,10 +135,6 @@ function validate_password() {
 /**
  * Reset all field values as origin if users click on "Reset" button
  */
-var oldFirstName = document.querySelector("#firstName").value;
-var oldLastName = document.querySelector("#lastName").value;
-var oldPassword = document.querySelector("#userPassword").value;
-
 document.getElementById("reset").addEventListener("click", function () {
     document.querySelector("#firstName").value = oldFirstName;
     document.querySelector("#lastName").value = oldLastName;

@@ -7,6 +7,18 @@ const options = document.querySelectorAll(".menu li");
 const selected = document.querySelector(".selected");
 let dropdownButtonClicks = 0;
 
+// Gets all posts and populates the page.
+document.addEventListener("DOMContentLoaded", function() {
+    fetch('/api/post-list')
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById("post-goes-here").appendChild(html)
+        })
+        .catch(error => {
+            console.error('Error fetching admin list:', error);
+        });
+});
+
 /**
  * Open the dropdown menu if the number of clicks on dropdown menu is odd.
  * Close the dropdown menu if that number is even (for example, when user wants to select type later).

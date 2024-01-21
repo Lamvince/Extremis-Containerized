@@ -12,9 +12,6 @@ const jwt = require('jsonwebtoken');
 const mysql = require("mysql2");
 const app = express();
 const fs = require("fs");
-const {
-    JSDOM
-} = require('jsdom');
 const multer = require("multer");
 
 const key = process.env.JWT_KEY;
@@ -119,7 +116,6 @@ app.post('/api/refesh-authorize', (req, res) => {
 
 //function needed for getting list of all users in user-list
 app.get("/api/user-list", function (req, res) {
-    let user_list_jsdom = new JSDOM(doc);
     res.setHeader("Content-Type", "text/html");
 
     connection.query(
@@ -147,15 +143,13 @@ app.get("/api/user-list", function (req, res) {
                     "</button></td></tr></tbody>"
                 );
             }
-            user_list_jsdom.window.document.getElementById("user-container").innerHTML = user_list;
-            res.send(user_list_jsdom.serialize());
+            res.send(user_list);
         }
     );
 });
 
 // function for getting all admins for admin-list
 app.get("/api/admin-list", function (req, res) {
-    let admin_list_jsdom = new JSDOM(doc);
     res.setHeader("Content-Type", "text/html");
     const userID = parseToken(req)?.userID;
 
@@ -185,8 +179,7 @@ app.get("/api/admin-list", function (req, res) {
                     );
                 }
             }
-            admin_list_jsdom.window.document.getElementById("user-container").innerHTML = admin_list;
-            res.send(admin_list_jsdom.serialize());
+            res.send(admin_list);
         }
     );
 });
@@ -245,9 +238,10 @@ app.post("/api/add-user", function (req, res) {
                 msg: "This email is invalid."
             });
         } else {
-            connection.query('INSERT INTO BBY_15_User (first_name, last_name, email, user_password) VALUES (?, ?, ?, ?)',
-                [req.body.firstName, req.body.lastName, req.body.email, req.body.password],
+            connection.query('INSERT INTO BBY_15_User (first_name, last_name, email, user_password, admin_role) VALUES (?, ?, ?, ?, ?)',
+                [req.body.firstName, req.body.lastName, req.body.email, req.body.password, 0],
                 function (error, results, fields) {
+                    if (error) throw error;
                     if (error && error.errno == 1062) {
                         res.send({
                             status: "duplicate",
@@ -320,12 +314,12 @@ app.post("/api/add-user-as-admin", function (req, res) {
 //Get the user 's information from the database and display information on the profile page
 app.get("/api/profile", function (req, res) {
     const userID = parseToken(req)?.userID;
+    let template = "";
 
     connection.query(
         "SELECT * FROM BBY_15_User WHERE user_id = ?",
         [userID],
         function (error, results, fields) {
-            let profileDOM = new JSDOM(profile);
             if (results.length > 0) {
                 for (var i = 0; i < results.length; i++) {
                     let firstname = results[i].first_name;
@@ -336,7 +330,7 @@ app.get("/api/profile", function (req, res) {
                     if (results[i].profile_picture != null) {
                         userprofile = results[i].profile_picture;
                     }
-                    var template = `   
+                    template = `   
                     </br>  
                     <div class="account-body"> 
                     <div class='profile-pic-div'>
@@ -396,9 +390,8 @@ app.get("/api/profile", function (req, res) {
                         </div>  
                     </div>
                 `;
-                    let area = profileDOM.window.document.querySelector('#user_content');
-                    area.innerHTML += template;
                 }
+                res.send(template);
             }
         }
     )
@@ -673,8 +666,6 @@ app.get("/api/timeline", function (req, res) {
         WHERE post_status = "approved" OR post_status = "pending"
         ORDER BY posted_time DESC`,
         function (error, results, fields) {
-            let timeline = fs.readFileSync("../app/html/timeline.html", "utf8");
-            let timelineDOM = new JSDOM(timeline);
             if (results.length >= 0) {
                 for (var i = 0; i < results.length; i++) {
                     let firstName = results[i].first_name;
@@ -725,10 +716,8 @@ app.get("/api/timeline", function (req, res) {
                             <p class="read-more"><a href="#" class="read-more-button">Read More</a></p>
                         </div>
                     </div>`;
-                    let area = timelineDOM.window.document.querySelector('.post_content');
-                    area.innerHTML += template;
                 }
-                res.send(timelineDOM.serialize());
+                res.send(template);
             }
         }
     )
@@ -819,8 +808,6 @@ app.get("/api/post-list", function (req, res) {
         "SELECT * FROM BBY_15_post LEFT JOIN BBY_15_post_images ON BBY_15_post.post_id = BBY_15_post_images.post_id ORDER BY posted_time DESC",
         [],
         function (error, results, fields) {
-            let postList = fs.readFileSync("../app/html/post-list.html", "utf8");
-            let postListDOM = new JSDOM(postList);
             let cardTemplate = postListDOM.window.document.getElementById("postCardTemplate");
             if (results.length >= 0) {
                 for (var i = 0; i < results.length; i++) {
@@ -861,7 +848,7 @@ app.get("/api/post-list", function (req, res) {
                     postListDOM.window.document.getElementById("post-goes-here").appendChild(newcard);
                 }
             }
-            res.send(postListDOM.serialize());
+            res.send(newcard);
         })
 });
 

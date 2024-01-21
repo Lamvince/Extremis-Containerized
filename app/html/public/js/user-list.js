@@ -12,8 +12,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
 });
 
-getList();
-
 /**
  * Sends the user data from the client side to the server side for authentication.
  * User clicks on the data that needs to be changed through the text box, and it changes on to the server side in real time

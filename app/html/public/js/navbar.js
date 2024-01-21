@@ -57,7 +57,7 @@ function navbar() {
                         <li><a href="/my-posts">My Posts</a></li>
                         <li><a href="/about-us">About Us</a></li>
                         <li>
-                            <form action="/api/logout" method="get">
+                            <form>
                                 <input type="submit" class="singin" value="Sign out" />
                             </form>
                         </li>
