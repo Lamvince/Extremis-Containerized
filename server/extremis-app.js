@@ -11,7 +11,6 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const mysql = require("mysql2");
 const app = express();
-const fs = require("fs");
 const multer = require("multer");
 
 const key = process.env.JWT_KEY;
@@ -114,6 +113,7 @@ app.post('/api/refesh-authorize', (req, res) => {
     });
 });
 
+
 //function needed for getting list of all users in user-list
 app.get("/api/user-list", function (req, res) {
     res.setHeader("Content-Type", "text/html");
@@ -183,6 +183,7 @@ app.get("/api/admin-list", function (req, res) {
         }
     );
 });
+
 
 //Authenticate user
 app.post("/api/login", function (req, res) {
@@ -443,6 +444,7 @@ const uploadAvatar = multer({
     storage: storage_avatar
 });
 
+
 //Upload the user profle into the database
 app.post('/api/upload-avatar', uploadAvatar.array("files"), async function (req, res) {
     const userID = parseToken(req)?.userID;
@@ -466,6 +468,7 @@ app.post('/api/upload-avatar', uploadAvatar.array("files"), async function (req,
             });
     }
 });
+
 
 /** ANOTHER POST: we are changing stuff on the server!!!
  *  This function updates the user on the user-list and the admin-list
@@ -658,6 +661,7 @@ app.post('/api/upload-post-images', uploadPostImages.array("files"), async funct
     }
 });
 
+
 //Get the post and event information from the database and display information on the timeline page
 app.get("/api/timeline", function (req, res) {
     connection.query(`SELECT * FROM BBY_15_User 
@@ -808,48 +812,67 @@ app.get("/api/post-list", function (req, res) {
         "SELECT * FROM BBY_15_post LEFT JOIN BBY_15_post_images ON BBY_15_post.post_id = BBY_15_post_images.post_id ORDER BY posted_time DESC",
         [],
         function (error, results, fields) {
-            let cardTemplate = postListDOM.window.document.getElementById("postCardTemplate");
+            let cardTemplate = "";
             if (results.length >= 0) {
                 for (var i = 0; i < results.length; i++) {
-                    let newcard = cardTemplate.content.cloneNode(true);
-                    newcard.querySelector('.current-status').innerHTML = results[i].post_status + ' <i class="fa-solid fa-pen"></i>';
-                    newcard.querySelector('.userID').innerHTML = "<b>User ID: </b>" + results[i].user_id;
-                    newcard.querySelector('.post-type').innerHTML = "<b>Type: </b>" + results[i].post_type;
-                    newcard.querySelector('.post-title').innerHTML = "<b>Title: </b>" + results[i].post_title;
-                    newcard.querySelector('.weather-type').innerHTML = "<b>Weather Type: </b>" + results[i].weather_type;
-                    newcard.querySelector('.post-location').innerHTML = "<b>Location: </b>" + results[i].location;
-                    newcard.querySelector('.post-time').innerHTML = "<b>Time: </b>" + results[i].posted_time;
-                    newcard.querySelector('.post-content').innerHTML = "<b>Content: </b>" + results[i].post_content;
-                    newcard.querySelector('.postID').innerHTML = results[i].post_id;
+                    cardTemplate += `<div class="post">
+                    <div class="post-body">
+                      <div class="userID"><b>User ID: </b>${results[i].user_id}</div>
+                      <div class="postID">${results[i].post_id}</div>
+                      <div class="post-status">
+                        <b>Status: </b>
+                        <button class="current-status">${results[i].post_status} <i class="fa-solid fa-pen"></i></button>
+                        <button class="cancel-btn" onclick="cancel(this)">Cancel</button>
+                        <button class="approve-btn" onclick="approve(this)">Approve</button>
+                        <button class="reject-btn" onclick="reject(this)">Reject</button>
+                      </div>
+                      <div class="post-type"><b>Type: </b>${results[i].post_type}</div>
+                      <div class="post-title"><b>Title: <b>${results[i].post_title}</div>
+                      <div class="weather-type"><b>Weather Type: </b>${results[i].weather_type}</div>
+                      <div class="post-location"><b>Location: </b>${results[i].location}</div>
+                      <div class="post-time"><b>Time: </b>${results[i].posted_time}</div>`;
+
+                    //Add Read more button if the total length of the post content is more than 500, otherwise generate post content normally
+                    if (results[i].post_content.length >= 500) {
+                        cardTemplate += `<div class="sidebar-box">
+                            <p class="post-content">${results[i].post_content}</p>
+                            <p class="read-more">
+                                <button onclick="expandText(this)" class="more-button">
+                                    Read More
+                                </button>
+                            </p>
+                        </div>` 
+                    } else {
+                        cardTemplate += `<div class="sidebar-box">
+                            <p class="post-content">${results[i].post_content}</p>
+                        </div>`
+                    }
+
+                    cardTemplate += `</div>`;
 
                     if (results[i].image_location == "https://extremis-bby15.s3.ca-central-1.amazonaws.com/default-profile.jpg") {
                         // Set src property of img tag as default and display property as none if the post has no images
-                        newcard.querySelector('.card-images').innerHTML = '<img class="card-image" src="' + results[i].image_location + '" alt="no image" style="display: none" />';
+                        cardTemplate += `<div class="card-images">
+                            <img class="card-image" src="'${results[i].image_location}'" alt="no image" style="display: none" />
+                        </div>`;
                     } else {
-                        let str = '<img class="card-image" src="' + results[i].image_location + '" onclick = "expandImage(this)" alt="post image"/>';
+                        cardTemplate +=`<div class="card-images">
+                            <img class="card-image" src="''${results[i].image_location}'" onclick="expandImage(this) alt="post image" />`;
                         // Set src property of img tag as the image path
                         while (results[i].post_id && results[i + 1] && (results[i].post_id == results[i + 1].post_id)) {
                             i++;
                             if (results[i].image_location != "https://extremis-bby15.s3.ca-central-1.amazonaws.com/default-profile.jpg") {
-                                str += '<img class="card-image" src="' + results[i].image_location + '" onclick = "expandImage(this)" alt="post image"/>';
+                                cardTemplate += `<img class="card-image" src="'${results[i].image_location}'" onclick="expandImage(this) alt="post image" />`
                             }
                         }
-                        newcard.querySelector('.card-images').innerHTML = str;
+                        cardTemplate += `</div>`
                     }
-
-                    //Add Read more button if the total length of the post content is more than 500
-                    if (results[i].post_content.length >= 500) {
-                        let p = postListDOM.window.document.createElement("p");
-                        p.setAttribute("class", "read-more");
-                        newcard.querySelector('.sidebar-box').appendChild(p);
-                        newcard.querySelector('.read-more').innerHTML = '<button onclick="expandText(this)" class="more-button">Read More</button>';
-
-                    }
-                    postListDOM.window.document.getElementById("post-goes-here").appendChild(newcard);
+                    cardTemplate += `</div>`
                 }
             }
-            res.send(newcard);
-        })
+            res.send(cardTemplate);
+        }
+    )
 });
 
 // Update the status section of a post.
@@ -883,7 +906,6 @@ app.get("/api/my-post", function (req, res) {
         ORDER BY posted_time DESC`,
         [userID],
         function (error, results, fields) {
-            let my_post_jsdom = new JSDOM(doc);
             res.setHeader("Content-Type", "text/html");
             if (results != null) {
                 for (let i = 0; i < results.length; i++) {
@@ -958,10 +980,9 @@ app.get("/api/my-post", function (req, res) {
                                 </div>
                             </div>
                         `;
-                    my_post_jsdom.window.document.getElementById("my-post-content").innerHTML += my_post;
                 }
             }
-            res.send(my_post_jsdom.serialize());
+            res.send(my_post);
         }
     )
 });
