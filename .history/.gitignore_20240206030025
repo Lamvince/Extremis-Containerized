@@ -4,5 +4,4 @@ package-lock.json/
 avatar/
 post-images/
 *.yml
-*.yaml
 .env/
