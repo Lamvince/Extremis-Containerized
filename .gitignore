@@ -5,5 +5,4 @@ avatar/
 post-images/
 *.yml
 *.yaml
-.env/
-.env
+server/.env
