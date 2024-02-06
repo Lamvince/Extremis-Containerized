@@ -28,6 +28,17 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
+// Preview the image after it is selected but before uploading
+function previewImage(event) {
+    var reader = new FileReader();
+    reader.onload = function() {
+        var output = document.querySelector('.profile-pic');
+        output.src = reader.result;
+        output.style.display = 'block';
+    };
+    reader.readAsDataURL(event.target.files[0]);
+    document.querySelector(".reminder").innerHTML = `<small style="color:rgba(52, 119, 249, 0.9)">*Remember to click "save" to save your changes*</small>`;
+}
 
 /**
  * Send data from client side to server for authentication.
@@ -54,7 +65,7 @@ async function sendData(data) {
         }
         else {
             localStorage.setItem("token", parsedJSON.token);
-            window.location.reload();
+            previewImage(event);
         }
     } catch (error) {}
 }
@@ -102,7 +113,6 @@ function uploadImages(e) {
         method: 'POST',
         headers: {
             "Accept": 'application/json',
-            "Content-Type": 'application/json',
             'Authorization': `Bearer ${token}`
         },
         body: formData,
@@ -142,14 +152,14 @@ document.getElementById("reset").addEventListener("click", function () {
 });
 
 // Display/Hide password (https://www.csestack.org/hide-show-password-eye-icon-html-javascript/)
-var togglePasswords = document.querySelectorAll('.togglePassword');
-for (let i = 0; i < togglePasswords.length; i++) {
-    togglePasswords[i].addEventListener('click', function (e) {
-        const password = e.target.previousElementSibling;
-        // toggle the type attribute
-        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-        password.setAttribute('type', type);
-        // toggle the eye slash icon
-        this.classList.toggle('fa-eye-slash');
-    });
-}
+// var togglePasswords = document.querySelectorAll('.togglePassword');
+// for (let i = 0; i < togglePasswords.length; i++) {
+//     togglePasswords[i].addEventListener('click', function (e) {
+//         const password = e.target.previousElementSibling;
+//         // toggle the type attribute
+//         const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+//         password.setAttribute('type', type);
+//         // toggle the eye slash icon
+//         this.classList.toggle('fa-eye-slash');
+//     });
+// }

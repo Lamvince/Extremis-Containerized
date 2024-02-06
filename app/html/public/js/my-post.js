@@ -13,14 +13,17 @@ document.addEventListener("DOMContentLoaded", function() {
 
     fetch('/api/my-post', {
         headers: {
+            "Accept": 'application/json',
+            "Content-Type": 'application/json',
             'Authorization': `Bearer ${token}`
         }
     })
     .then(response => response.text())
     .then(data => {
-        document.querySelector('#my=post-content').innerHTML = data;
-    })
-    .catch(error => {
+        document.querySelector('#my-post-content').innerHTML = data;
+    }).then(() => {
+        assignElements();
+    }).catch(error => {
         console.error('Error fetching data:', error);
     });
 });
@@ -158,19 +161,12 @@ async function sendDataToDelete(e) {
             let parsedJSON = await responseObject.json();
 
             if (parsedJSON.status == "success") {
-                e.target.parentNode.parentNode.parentNode.remove();
-                window.location.replace("/my-post");
+                e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.remove();
             }
             document.querySelector("#err-popup").style.display = "none";
         } catch (error) {}
     });
 
-}
-
-//This for loop adds the event listeners to the delete post button
-let deleteRecords = document.getElementsByClassName("delete1");
-for (let i = 0; i < deleteRecords.length; i++) {
-    deleteRecords[i].addEventListener("click", sendDataToDelete);
 }
 
 
@@ -200,17 +196,32 @@ async function sendDataToDeleteImage(e) {
     } catch (error) {}
 }
 
-//This for loop adds the event listeners to the delete image button
-let deleteImageRecords = document.getElementsByClassName("remove-icon");
-for (let i = 0; i < deleteImageRecords.length; i++) {
-    deleteImageRecords[i].addEventListener("click", sendDataToDeleteImage);
+function assignElements() {
+    //This for loop adds the event listeners to the delete post button
+    let deleteRecords = document.getElementsByClassName("delete1");
+    for (let i = 0; i < deleteRecords.length; i++) {
+        deleteRecords[i].addEventListener("click", sendDataToDelete);
+    }
+
+    //This for loop adds the event listeners to the delete image button
+    let deleteImageRecords = document.getElementsByClassName("remove-icon");
+    for (let i = 0; i < deleteImageRecords.length; i++) {
+        deleteImageRecords[i].addEventListener("click", sendDataToDeleteImage);
+    }
+
+    const upLoadForms = document.querySelectorAll(".form-input");
+    for (let i = 0; i < upLoadForms.length; i++) {
+        upLoadForms[i].addEventListener("click", sendDataToaddImage);
+        upLoadForms[i].addEventListener("click", uploadImages);
+    }
 }
 
-const upLoadForms = document.querySelectorAll(".form-input");
-for (let i = 0; i < upLoadForms.length; i++) {
-    upLoadForms[i].addEventListener("click", sendDataToaddImage);
-    upLoadForms[i].addEventListener("click", uploadImages);
-}
+/**
+ * If users click on "Cancel" button in popup message, hide the popup message so that users can edit all input.
+ */
+document.getElementById("cancel2").addEventListener("click", function () {
+    document.querySelector("#err-popup").style.display = "none";
+});
 
 async function uploadImages(e) {
     e.preventDefault();
@@ -224,7 +235,6 @@ async function uploadImages(e) {
         method: 'POST',
         headers: {
             "Accept": 'application/json',
-            "Content-Type": 'application/json',
             'Authorization': `Bearer ${token}`
         },
         body: formData,
@@ -256,15 +266,6 @@ async function sendDataToaddImage(e) {
         let parsedJSON = await responseObject.json();
         if (parsedJSON.status == "success") {
             localStorage.setItem("token", parsedJSON.token);
-            parent.parentNode.remove();
-            window.location.replace("/my-post");
         }
     } catch (error) {}
 }
-
-/**
- * If users click on "Cancel" button in popup message, hide the popup message so that users can edit all input.
- */
-document.getElementById("cancel2").addEventListener("click", function () {
-    document.querySelector("#err-popup").style.display = "none";
-});

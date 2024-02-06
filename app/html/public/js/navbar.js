@@ -21,9 +21,9 @@ function navbar() {
 
                 <!-- Create a hamburger menu  -->
                 <a href="#" class="toggle-button">
-                    <span class="bar"></span>
-                    <span class="bar"></span>
-                    <span class="bar"></span>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
                 </a>
                 <!-- Create navbar links -->
                 <div class="navbar-links">
@@ -32,7 +32,7 @@ function navbar() {
                         <li><a href="/profile">Profile</a></li>
                         <li><a href="/about-us">About Us</a></li>
                         <li>
-                            <form action="/api/logout" method="get">
+                            <form>
                                 <input type="submit" class="singin" value="Sign out" />
                             </form>
                         </li>
@@ -45,16 +45,16 @@ function navbar() {
 
                 <!-- Create a hamburger menu  -->
                 <a href="#" class="toggle-button">
-                    <span class="bar"></span>
-                    <span class="bar"></span>
-                    <span class="bar"></span>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
+                    <div class="bar"></div>
                 </a>
                 <!-- Create navbar links -->
                 <div class="navbar-links">
                     <ul>
                         <li><a href="/main">Home</a></li>
                         <li><a href="/profile">Profile</a></li>
-                        <li><a href="/my-posts">My Posts</a></li>
+                        <li><a href="/my-post">My Posts</a></li>
                         <li><a href="/about-us">About Us</a></li>
                         <li>
                             <form>

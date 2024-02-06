@@ -1,16 +1,38 @@
 "use strict";
 
-// Gets the user data of all users populates the page.
-document.addEventListener("DOMContentLoaded", function() {
-    fetch('/api/user-list')
+// Gets the user data of all users or admins and populates the page.
+if (window.location.pathname == "/admin-list") {
+    document.addEventListener("DOMContentLoaded", function() {
+        const token = localStorage.getItem('token');
+        fetch('/api/admin-list', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
         .then(response => response.text())
         .then(html => {
-            document.getElementById("user-container").innerHTML = html;
-        })
-        .catch(error => {
-            console.error('Error fetching admin list:', error);
+            document.querySelector('#user-container').innerHTML = html;
+        }).then(() => {
+            //This for loop adds the event listener to every editing columns in the user list.
+            addListeners();
+        }).catch(error => {
+            console.error('Error fetching data:', error);
         });
-});
+    });
+} else if (window.location.pathname == "/user-list") {
+    document.addEventListener("DOMContentLoaded", function() {
+        fetch('/api/user-list')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById("user-container").innerHTML = html;
+            }).then(() => {
+                //This for loop adds the event listener to every editing columns in the user list.
+                addListeners();
+            }).catch(error => {
+                console.error('Error fetching user list:', error);
+            });
+    });
+}
 
 /**
  * Sends the user data from the client side to the server side for authentication.
@@ -37,12 +59,6 @@ async function sendData(data) {
             document.getElementById("emptyError").innerHTML = `<small style="color:red;">*Email already in use. Changes not saved*</small>`;
         }
     } catch (error) {}
-}
-
-//This for loop adds the event listener to every editing columns in the user list.
-let records = document.getElementsByTagName("span");
-for (let i = 0; i < records.length; i++) {
-    records[i].addEventListener("click", editCell);
 }
 
 //This function helps the admin edit the Cell and get the values readied to send to the serer side.
@@ -121,22 +137,30 @@ async function sendDataToDelete(e) {
     });
 }
 
-//This for loop adds the event listeners to the delete user button
-let deleteRecords = document.getElementsByClassName("deleteUser");
-for (let i = 0; i < deleteRecords.length; i++) {
-    deleteRecords[i].addEventListener("click", sendDataToDelete);
-}
+function addListeners() {
+    //This for loop adds the event listener to every editing columns in the user list.
+    let records = document.getElementsByTagName("span");
+    for (let i = 0; i < records.length; i++) {
+        records[i].addEventListener("click", editCell);
+    }
 
-//This for loop adds the event listener to the Make user button
-let makeUserRecords = document.getElementsByClassName("role_switch_to_user");
-for (let i = 0; i < makeUserRecords.length; i++) {
-    makeUserRecords[i].addEventListener("click", sendDataToMakeUser);
-}
+    //This for loop adds the event listeners to the delete user button
+    let deleteRecords = document.getElementsByClassName("deleteUser");
+    for (let i = 0; i < deleteRecords.length; i++) {
+        deleteRecords[i].addEventListener("click", sendDataToDelete);
+    }
 
-//This for loop adds the event listener to the Make Admin button
-let makeAdminRecords = document.getElementsByClassName("role_switch_to_admin");
-for (let i = 0; i < makeAdminRecords.length; i++) {
-    makeAdminRecords[i].addEventListener("click", sendDataToMakeAdmin);
+    //This for loop adds the event listener to the Make user button
+    let makeUserRecords = document.getElementsByClassName("role_switch_to_user");
+    for (let i = 0; i < makeUserRecords.length; i++) {
+        makeUserRecords[i].addEventListener("click", sendDataToMakeUser);
+    }
+
+    //This for loop adds the event listener to the Make Admin button
+    let makeAdminRecords = document.getElementsByClassName("role_switch_to_admin");
+    for (let i = 0; i < makeAdminRecords.length; i++) {
+        makeAdminRecords[i].addEventListener("click", sendDataToMakeAdmin);
+    }
 }
 
 //This data sends the user data from the client side to the server side so that the specified admin user can become regular user.

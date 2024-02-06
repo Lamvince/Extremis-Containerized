@@ -82,14 +82,14 @@ function validate_password() {
 }
 
 // Display/Hide password (https://www.csestack.org/hide-show-password-eye-icon-html-javascript/)
-var togglePasswords = document.querySelectorAll('.togglePassword');
-for (let i = 0; i < togglePasswords.length; i++) {
-    togglePasswords[i].addEventListener('click', function (e) {
-        const password = e.target.previousElementSibling;
-        // toggle the type attribute
-        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-        password.setAttribute('type', type);
-        // toggle the eye slash icon
-        this.classList.toggle('fa-eye-slash');
-    });
-}
+// var togglePasswords = document.querySelectorAll('.togglePassword');
+// for (let i = 0; i < togglePasswords.length; i++) {
+//     togglePasswords[i].addEventListener('click', function (e) {
+//         const password = e.target.previousElementSibling;
+//         // toggle the type attribute
+//         const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+//         password.setAttribute('type', type);
+//         // toggle the eye slash icon
+//         this.classList.toggle('fa-eye-slash');
+//     });
+// }

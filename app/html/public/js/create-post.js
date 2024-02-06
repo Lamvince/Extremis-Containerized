@@ -7,6 +7,7 @@ const options = document.querySelectorAll(".menu li");
 const selected = document.querySelector(".selected");
 const question = document.getElementById("weather-type");
 let dropdownButtonClicks = 0;
+const formData = new FormData();
 
 /**
  * Open the dropdown menu if the number of clicks on dropdown menu is odd.
@@ -94,14 +95,12 @@ async function sendData(data) {
             // Display error message if data of the post has not been stored into database
             document.getElementById("emptyError").innerHTML = "<small>*All required fields have to be filled*</small>";
         } else {
-            localStorage.setItem("token", parsedJSON.token);
             // Send data of images uploaded by users to the server later.
             let responseObject2 = await fetch("/api/upload-post-images", {
                 method: 'POST',
                 headers: {
                     "Accept": 'application/json',
-                    "Content-Type": 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${parsedJSON.token}`
                 },
                 body: formData
             });
@@ -220,7 +219,6 @@ upload_images.addEventListener("submit", function (e) {
         formData.append("files", imagesUpload.files[i]);
     }
 });
-const formData = new FormData();
 
 
 /**
@@ -294,7 +292,7 @@ function getCity(coordinates) {
  */
 tinymce.init({
     selector: '#postContent',
-    plugins: 'wordcount a11ychecker advcode casechange export formatpainter linkchecker autolink lists checklist permanentpen powerpaste tinymcespellchecker',
+    plugins: 'wordcount autolink lists',
     toolbar: 'a11ycheck alignleft aligncenter alignright alignfull bold italic underline forecolor fontname fontsize casechange checklist formatpainter',
     toolbar_mode: 'floating',
     tinycomments_mode: 'embedded'

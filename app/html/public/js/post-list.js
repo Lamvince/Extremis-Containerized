@@ -12,10 +12,10 @@ document.addEventListener("DOMContentLoaded", function() {
     fetch('/api/post-list')
         .then(response => response.text())
         .then(html => {
-            document.getElementById("post-goes-here").appendChild(html)
+            document.getElementById("post-goes-here").innerHTML = html;
         })
         .catch(error => {
-            console.error('Error fetching admin list:', error);
+            console.error('Error fetching post list:', error);
         });
 });
 

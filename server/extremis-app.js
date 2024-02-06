@@ -15,10 +15,8 @@ const multer = require("multer");
 
 const key = process.env.JWT_KEY;
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({
-    extended: true
-}));
+app.use(express.json({ limit: '5mb' }));
+app.use(express.urlencoded({ limit: '5mb', extended: true }));
 
 const connectionLocal = {
     host: process.env.DB_HOST,
@@ -292,9 +290,10 @@ app.post("/api/add-user-as-admin", function (req, res) {
             });
         } else {
             //connecting to the database, then creating and adding the user info into the database.
-            connection.query('INSERT INTO BBY_15_User (first_name, last_name, email, user_password) VALUES (?, ?, ?, ?)',
-                [req.body.firstName, req.body.lastName, req.body.email, req.body.password, ],
+            connection.query('INSERT INTO BBY_15_User (first_name, last_name, email, user_password, admin_role) VALUES (?, ?, ?, ?, ?)',
+                [req.body.firstName, req.body.lastName, req.body.email, req.body.password, false],
                 function (error, results, fields) {
+                    console.log(error);
                     if (error && error.errno == 1062) {
                         res.send({
                             status: "duplicate",
@@ -340,8 +339,8 @@ app.get("/api/profile", function (req, res) {
                             <img class="camera" src="https://extremis-bby15.s3.ca-central-1.amazonaws.com/camera-icon1.jpg" width="28" height="28"/>
                         </label>
                         <input type="file" class="btn" id="selectFile" accept="image/png, image/gif, image/jpeg"
-                        multiple="multiple" />
-
+                        multiple="multiple" onchange="previewImage(event)"/>
+                        <p class="reminder"></p>
                     </div>                         
                         <div id="user_title">
                         <h2>${firstname} ${lastname} </h2>
@@ -374,7 +373,7 @@ app.get("/api/profile", function (req, res) {
                                     </div> 
                                 </label>
                                 <input type="password" id="userPassword" required="required"value=${password} />
-                                <i class="fa-solid fa-eye togglePassword"></i>
+                                <!-- <i class="fa-solid fa-eye togglePassword"></i> -->
                             </div>
                             <div class="form-group">
                                 <label for="password">Confirm password
@@ -384,7 +383,7 @@ app.get("/api/profile", function (req, res) {
                                 </label>
                                 <input type="password" id="userConfirmPassword" required="required"
                                 value=${password} onkeyup="validate_password()"/>
-                                <i class="fa-solid fa-eye togglePassword"></i>
+                                <!-- <i class="fa-solid fa-eye togglePassword"></i> -->
                             </div>
                         </div>
                             
@@ -600,8 +599,12 @@ app.post("/api/add-post", function (req, res) {
     connection.query('INSERT INTO BBY_15_Post (user_id, posted_time, post_content, post_title, post_type, location, post_status, weather_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
         [userID, post_time, post_content, post_title, post_type, post_location, post_status, weather_type],
         function (error, results, fields) {
-            payload.postID = results.insertId;
-            const newToken = jwt.sign(payload, key, {expiresIn: "30m"});
+            const newToken = jwt.sign({
+                name : payload.name,
+                isAdmin : payload.isAdmin,
+                userID : payload.userID,
+                postID : results.insertId},
+                key, {expiresIn: "30m"});
             res.send({
                 status: "success",
                 msg: "Post added to database.",
@@ -615,6 +618,7 @@ app.post("/api/add-post", function (req, res) {
  * The following codes follow Instructor Arron's example with changes and adjustments made by Linh.
  */
 var s3 = require('./s3');
+const { errorOut } = require('firebase-tools');
 
 // Store images in post-images folder in system if user is accessing through local host
 var storage_post_images = multer.diskStorage({
@@ -644,7 +648,9 @@ app.post('/api/upload-post-images', uploadPostImages.array("files"), async funct
 
             connection.query('INSERT INTO BBY_15_Post_Images (post_id, image_location) VALUES (?, ?)',
                 [postID, newpathImages],
-                function (error, results, fields) {});
+                function (error, results, fields) {
+                    console.log(error);
+                });
         }
         res.send({
             status: "success",
@@ -664,9 +670,10 @@ app.post('/api/upload-post-images', uploadPostImages.array("files"), async funct
 
 //Get the post and event information from the database and display information on the timeline page
 app.get("/api/timeline", function (req, res) {
+    let template = "";
     connection.query(`SELECT * FROM BBY_15_User 
-        INNER JOIN BBY_15_post ON BBY_15_User.user_id = BBY_15_Post.user_id 
-        LEFT JOIN BBY_15_post_images ON BBY_15_post.post_id = BBY_15_post_images.post_id 
+        INNER JOIN BBY_15_Post ON BBY_15_User.user_id = BBY_15_Post.user_id 
+        LEFT JOIN BBY_15_Post_Images ON BBY_15_Post.post_id = BBY_15_Post_Images.post_id 
         WHERE post_status = "approved" OR post_status = "pending"
         ORDER BY posted_time DESC`,
         function (error, results, fields) {
@@ -686,7 +693,7 @@ app.get("/api/timeline", function (req, res) {
                     } else {
                         profilePic = "https://extremis-bby15.s3.ca-central-1.amazonaws.com/default-profile.jpg";
                     }
-                    var template = `   
+                    template += `   
                     </br>  
                     <div class="post_content">
                         <div class="card">
@@ -731,9 +738,9 @@ app.post('/api/search-timeline', function (req, res) {
     const term = req.body.searchTerm;
 
     connection.query(`SELECT * FROM BBY_15_User
-    INNER JOIN BBY_15_post ON BBY_15_User.user_id = BBY_15_Post.user_id 
-    LEFT JOIN BBY_15_post_images 
-    ON BBY_15_post.post_id = BBY_15_post_images.post_id 
+    INNER JOIN BBY_15_Post ON BBY_15_User.user_id = BBY_15_Post.user_id 
+    LEFT JOIN BBY_15_Post_Images 
+    ON BBY_15_Post.post_id = BBY_15_Post_Images.post_id 
     WHERE (LOWER(post_content) LIKE '%${term}%'
     OR LOWER(post_title) LIKE '%${term}%'
     OR LOWER(post_type) LIKE '%${term}%'
@@ -793,7 +800,6 @@ app.post('/api/search-timeline', function (req, res) {
                     </div>
                 </div>`;
                 }
-                //res.send(timelineDOM.serialize());
                 res.send({
                     status: "success",
                     message: template
@@ -809,11 +815,13 @@ app.post('/api/search-timeline', function (req, res) {
  */
 app.get("/api/post-list", function (req, res) {
     connection.query(
-        "SELECT * FROM BBY_15_post LEFT JOIN BBY_15_post_images ON BBY_15_post.post_id = BBY_15_post_images.post_id ORDER BY posted_time DESC",
-        [],
+        `SELECT * FROM BBY_15_Post 
+        LEFT JOIN BBY_15_Post_Images 
+        ON BBY_15_Post.post_id = BBY_15_Post_Images.post_id 
+        ORDER BY posted_time DESC`,
         function (error, results, fields) {
             let cardTemplate = "";
-            if (results.length >= 0) {
+            if (results.length > 0) {
                 for (var i = 0; i < results.length; i++) {
                     cardTemplate += `<div class="post">
                     <div class="post-body">
@@ -853,16 +861,16 @@ app.get("/api/post-list", function (req, res) {
                     if (results[i].image_location == "https://extremis-bby15.s3.ca-central-1.amazonaws.com/default-profile.jpg") {
                         // Set src property of img tag as default and display property as none if the post has no images
                         cardTemplate += `<div class="card-images">
-                            <img class="card-image" src="'${results[i].image_location}'" alt="no image" style="display: none" />
+                            <img class="card-image" src="${results[i].image_location}" alt="no image" style="display: none" />
                         </div>`;
                     } else {
                         cardTemplate +=`<div class="card-images">
-                            <img class="card-image" src="''${results[i].image_location}'" onclick="expandImage(this) alt="post image" />`;
+                            <img class="card-image" src="${results[i].image_location}" onclick="expandImage(this)" alt="post image" />`;
                         // Set src property of img tag as the image path
                         while (results[i].post_id && results[i + 1] && (results[i].post_id == results[i + 1].post_id)) {
                             i++;
                             if (results[i].image_location != "https://extremis-bby15.s3.ca-central-1.amazonaws.com/default-profile.jpg") {
-                                cardTemplate += `<img class="card-image" src="'${results[i].image_location}'" onclick="expandImage(this) alt="post image" />`
+                                cardTemplate += `<img class="card-image" src="${results[i].image_location}" onclick="expandImage(this)" alt="post image" />`
                             }
                         }
                         cardTemplate += `</div>`
@@ -883,7 +891,7 @@ app.post("/api/update-status", function (req, res) {
     let status = req.body.postStatus;
 
     connection.query(
-        "UPDATE BBY_15_post SET post_status = ? WHERE post_id = ?",
+        "UPDATE BBY_15_Post SET post_status = ? WHERE post_id = ?",
         [status, postID],
         function (error, results, fields) {
             res.send({
@@ -901,12 +909,13 @@ app.get("/api/my-post", function (req, res) {
     const userID = parseToken(req)?.userID;
 
     connection.query(
-        `SELECT posted_time, post_content, BBY_15_post.post_id, post_title, location, weather_type, image_location, post_status 
-        FROM BBY_15_post LEFT JOIN BBY_15_post_images ON BBY_15_post.post_id = BBY_15_post_images.post_id WHERE user_id = ?
+        `SELECT posted_time, post_content, BBY_15_Post.post_id, post_title, location, weather_type, image_location, post_status 
+        FROM BBY_15_Post LEFT JOIN BBY_15_Post_Images ON BBY_15_Post.post_id = BBY_15_Post_Images.post_id WHERE user_id = ?
         ORDER BY posted_time DESC`,
         [userID],
         function (error, results, fields) {
             res.setHeader("Content-Type", "text/html");
+            let my_post = "";
             if (results != null) {
                 for (let i = 0; i < results.length; i++) {
                     let postTime = results[i].posted_time;
@@ -917,16 +926,16 @@ app.get("/api/my-post", function (req, res) {
                     let typeWeather = results[i].weather_type;
                     let postImages = results[i].image_location;
                     let postStatus = results[i].post_status;
-                    var my_post = `   
+                    my_post += `   
                     </br>  
-                    <div class="my-post-content">
+                    <div class="post-content">
                         <div class="card">
                             <div class="post-image">
                                 
                                 <div class="image">`;
                     if (postImages != "https://extremis-bby15.s3.ca-central-1.amazonaws.com/default-profile.jpg") {
                         my_post += `<div class="po-image">
-                        <img class="remove-icon"src="/assets/remove.png" width="18" height="18">
+                        <img class="remove-icon"src="/public/assets/remove.png" width="18" height="18">
                         <img class='image' src="${postImages}">
                         </div>`;
                     }
@@ -935,7 +944,7 @@ app.get("/api/my-post", function (req, res) {
                         i++;
                         if (results[i].image_location != "https://extremis-bby15.s3.ca-central-1.amazonaws.com/default-profile.jpg") {
                             my_post += `<div class="po-image">
-                            <img class="remove-icon"src="/assets/remove.png" width="18" height="18">
+                            <img class="remove-icon"src="/public/assets/remove.png" width="18" height="18">
                             `
                             my_post += "<img class='image' src=" + results[i].image_location + "></div>"
                         }
@@ -976,10 +985,10 @@ app.get("/api/my-post", function (req, res) {
                                             </div>
                                         </form>
                                     </div>
-                                    <div class="form-box-image">
+                                    <div class="form-box-image"></div>
                                 </div>
                             </div>
-                        `;
+                        </div>`;
                 }
             }
             res.send(my_post);
@@ -993,7 +1002,7 @@ app.get("/api/my-post", function (req, res) {
  */
 app.post('/api/delete-post', function (req, res) {
     res.setHeader('Content-Type', 'application/json');
-    connection.query('DELETE FROM BBY_15_post WHERE post_id = ?',
+    connection.query('DELETE FROM BBY_15_Post WHERE post_id = ?',
         [req.body.post_id],
         function (error, results, fields) {
             if (error) {
@@ -1013,7 +1022,7 @@ app.post('/api/delete-post', function (req, res) {
 app.post("/api/update-post", function (req, res) {
     const userID = parseToken(req)?.userID;
     res.setHeader('Content-Type', 'application/json');
-    connection.query('UPDATE BBY_15_post SET post_title = ?, location = ?, weather_type = ? WHERE post_id = ? AND user_id = ?',
+    connection.query('UPDATE BBY_15_Post SET post_title = ?, location = ?, weather_type = ? WHERE post_id = ? AND user_id = ?',
         [req.body.post_title, req.body.location, req.body.weather_type, req.body.post_id, userID],
         function (error, results, fields) {
             if (error) {
@@ -1030,7 +1039,7 @@ app.post("/api/update-post", function (req, res) {
 app.post("/api/update-post-content", function (req, res) {
     const userID = parseToken(req)?.userID;
     res.setHeader('Content-Type', 'application/json');
-    connection.query('UPDATE BBY_15_post SET post_content = ? WHERE post_id = ? AND user_id = ?',
+    connection.query('UPDATE BBY_15_Post SET post_content = ? WHERE post_id = ? AND user_id = ?',
         [req.body.post_content, req.body.post_id, userID],
         function (error, results, fields) {
             if (error) {
@@ -1046,8 +1055,12 @@ app.post("/api/update-post-content", function (req, res) {
 // When adding images, this function saves the ID of the post ahead of the image itself
 app.post("/api/change-images-post-data", function (req, res) {
     const payload = parseToken(req);
-    payload.postID = req.body.p;
-    const newToken = jwt.sign(payload, key, {expiresIn: "30m"});
+    const newToken = jwt.sign({
+        name : payload.name,
+        isAdmin : payload.isAdmin,
+        userID : payload.userID,
+        postID : req.body.p},
+        key, {expiresIn: "30m"});
     res.send({
         status: "success",
         token: newToken
@@ -1086,7 +1099,7 @@ app.post("/api/change-images-post", uploadPostImages.array("files"), async funct
  */
 app.post('/api/delete-image', function (req, res) {
     res.setHeader('Content-Type', 'application/json');
-    connection.query('DELETE FROM BBY_15_post_images WHERE image_location=?',
+    connection.query('DELETE FROM BBY_15_Post_Images WHERE image_location=?',
         [req.body.image],
         function (error, results, fields) {
             if (error) {
