@@ -6,3 +6,4 @@ post-images/
 *.yml
 *.yaml
 .env/
+.env
