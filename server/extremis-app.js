@@ -22,7 +22,9 @@ const connectionLocal = {
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME
+    database: process.env.DB_NAME,
+    connectionLimit: 10,
+    queueLimit: 10
 };
 
 var connection = mysql.createPool(connectionLocal);
@@ -119,6 +121,7 @@ app.get("/api/user-list", function (req, res) {
     connection.query(
         "SELECT * FROM BBY_15_User WHERE admin_role = 0",
         function (error, results, fields) {
+            connection.release();
 
             let user_list = `<thead><tr>
             <th class="id_header">ID</th>
@@ -154,6 +157,7 @@ app.get("/api/admin-list", function (req, res) {
     connection.query(
         "SELECT * FROM BBY_15_User WHERE admin_role = 1",
         function (error, results, fields) {
+            connection.release();
 
             let admin_list = `<thead><tr>
             <th class="id_header">ID</th>
@@ -240,6 +244,7 @@ app.post("/api/add-user", function (req, res) {
             connection.query('INSERT INTO BBY_15_User (first_name, last_name, email, user_password, admin_role) VALUES (?, ?, ?, ?, ?)',
                 [req.body.firstName, req.body.lastName, req.body.email, req.body.password, 0],
                 function (error, results, fields) {
+                    connection.release();
                     if (error) throw error;
                     if (error && error.errno == 1062) {
                         res.send({
@@ -293,6 +298,7 @@ app.post("/api/add-user-as-admin", function (req, res) {
             connection.query('INSERT INTO BBY_15_User (first_name, last_name, email, user_password, admin_role) VALUES (?, ?, ?, ?, ?)',
                 [req.body.firstName, req.body.lastName, req.body.email, req.body.password, false],
                 function (error, results, fields) {
+                    connection.release();
                     console.log(error);
                     if (error && error.errno == 1062) {
                         res.send({
@@ -320,6 +326,7 @@ app.get("/api/profile", function (req, res) {
         "SELECT * FROM BBY_15_User WHERE user_id = ?",
         [userID],
         function (error, results, fields) {
+            connection.release();
             if (results.length > 0) {
                 for (var i = 0; i < results.length; i++) {
                     let firstname = results[i].first_name;
@@ -414,6 +421,7 @@ app.post("/api/profile", function (req, res) {
         connection.query('UPDATE BBY_15_User SET first_name=?, last_name=?, email=?, user_password=? WHERE user_id=?',
             [req.body.firstName, req.body.lastName, req.body.email, req.body.password, userID],
             function (error, results, fields) {
+                connection.release();
                 const token = jwt.sign({
                     name : req.body.firstName,
                     isAdmin : adminStatus,
@@ -460,6 +468,7 @@ app.post('/api/upload-avatar', uploadAvatar.array("files"), async function (req,
         connection.query('UPDATE BBY_15_User SET profile_picture=? WHERE user_id=?',
             [newPath, userID],
             function (error, results, fields) {
+                connection.release();
                 res.send({
                     status: "success",
                     msg: "Image information added to database."
@@ -485,6 +494,7 @@ app.post('/api/update-user', function (req, res) {
         connection.query('UPDATE BBY_15_User SET first_name = ?, last_name = ?, email = ?, user_password = ? WHERE user_id = ?',
             [req.body.firstName, req.body.lastName, req.body.email, req.body.password, parseInt(req.body.id)],
             function (error, results, fields) {
+                connection.release();
                 if (error && error.errno == 1062) {
                     res.send({
                         status: "duplicate",
@@ -507,6 +517,7 @@ app.post('/api/delete-user', function (req, res) {
     connection.query('DELETE FROM BBY_15_User WHERE user_id = ?',
         [parseInt(req.body.id)],
         function (error, results, fields) {
+            connection.release();
             if (error) {
                 console.log(error);
             }
@@ -525,6 +536,7 @@ app.post('/api/make-user', function (req, res) {
     connection.query('UPDATE BBY_15_User SET admin_role = 0 WHERE user_id = ?',
         [parseInt(req.body.id)],
         function (error, results, fields) {
+            connection.release();
             if (error) {
                 console.log(error);
             }
@@ -544,6 +556,7 @@ app.post('/api/make-admin', function (req, res) {
     connection.query('UPDATE BBY_15_User SET admin_role = 1 WHERE user_id = ?',
         [parseInt(req.body.id)],
         function (error, results, fields) {
+            connection.release();
             if (error) {
                 console.log(error);
             }
@@ -599,6 +612,7 @@ app.post("/api/add-post", function (req, res) {
     connection.query('INSERT INTO BBY_15_Post (user_id, posted_time, post_content, post_title, post_type, location, post_status, weather_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
         [userID, post_time, post_content, post_title, post_type, post_location, post_status, weather_type],
         function (error, results, fields) {
+            connection.release();
             const newToken = jwt.sign({
                 name : payload.name,
                 isAdmin : payload.isAdmin,
@@ -649,6 +663,7 @@ app.post('/api/upload-post-images', uploadPostImages.array("files"), async funct
             connection.query('INSERT INTO BBY_15_Post_Images (post_id, image_location) VALUES (?, ?)',
                 [postID, newpathImages],
                 function (error, results, fields) {
+                    connection.release();
                     console.log(error);
                 });
         }
@@ -659,7 +674,9 @@ app.post('/api/upload-post-images', uploadPostImages.array("files"), async funct
     } else {
         connection.query('INSERT INTO BBY_15_Post_Images (post_id, image_location) VALUES (?, ?)',
             [postID, "https://extremis-bby15.s3.ca-central-1.amazonaws.com/default-profile.jpg"],
-            function (error, results, fields) {});
+            function (error, results, fields) {
+                connection.release();
+            });
         res.send({
             status: "success",
             msg: "No image has been uploaded"
@@ -677,6 +694,7 @@ app.get("/api/timeline", function (req, res) {
         WHERE post_status = "approved" OR post_status = "pending"
         ORDER BY posted_time DESC`,
         function (error, results, fields) {
+            connection.release();
             if (results.length >= 0) {
                 for (var i = 0; i < results.length; i++) {
                     let firstName = results[i].first_name;
@@ -749,6 +767,7 @@ app.post('/api/search-timeline', function (req, res) {
     AND (post_status = "approved" OR post_status = "pending")
     ORDER BY posted_time DESC`,
         function (error, results, fields) {
+            connection.release();
             if (results.length >= 0) {
                 var template = "";
                 for (var i = 0; i < results.length; i++) {
@@ -820,6 +839,7 @@ app.get("/api/post-list", function (req, res) {
         ON BBY_15_Post.post_id = BBY_15_Post_Images.post_id 
         ORDER BY posted_time DESC`,
         function (error, results, fields) {
+            connection.release();
             let cardTemplate = "";
             if (results.length > 0) {
                 for (var i = 0; i < results.length; i++) {
@@ -894,6 +914,7 @@ app.post("/api/update-status", function (req, res) {
         "UPDATE BBY_15_Post SET post_status = ? WHERE post_id = ?",
         [status, postID],
         function (error, results, fields) {
+            connection.release();
             res.send({
                 status: "success",
                 msg: "Post status has been updated in database."
@@ -906,6 +927,7 @@ app.post("/api/update-status", function (req, res) {
  * The following codes follow Instructor Arron's example with changes and adjustments made by Anh Nguyen
  */
 app.get("/api/my-post", function (req, res) {
+    res.setHeader("Content-Type", "text/html");
     const userID = parseToken(req)?.userID;
 
     connection.query(
@@ -914,7 +936,8 @@ app.get("/api/my-post", function (req, res) {
         ORDER BY posted_time DESC`,
         [userID],
         function (error, results, fields) {
-            res.setHeader("Content-Type", "text/html");
+            connection.release();
+            
             let my_post = "";
             if (results != null) {
                 for (let i = 0; i < results.length; i++) {
@@ -1005,6 +1028,7 @@ app.post('/api/delete-post', function (req, res) {
     connection.query('DELETE FROM BBY_15_Post WHERE post_id = ?',
         [req.body.post_id],
         function (error, results, fields) {
+            connection.release();
             if (error) {
                 console.log(error);
             }
@@ -1025,6 +1049,7 @@ app.post("/api/update-post", function (req, res) {
     connection.query('UPDATE BBY_15_Post SET post_title = ?, location = ?, weather_type = ? WHERE post_id = ? AND user_id = ?',
         [req.body.post_title, req.body.location, req.body.weather_type, req.body.post_id, userID],
         function (error, results, fields) {
+            connection.release();
             if (error) {
                 console.log(error);
             }
@@ -1042,6 +1067,7 @@ app.post("/api/update-post-content", function (req, res) {
     connection.query('UPDATE BBY_15_Post SET post_content = ? WHERE post_id = ? AND user_id = ?',
         [req.body.post_content, req.body.post_id, userID],
         function (error, results, fields) {
+            connection.release();
             if (error) {
                 console.log(error);
             }
@@ -1085,6 +1111,7 @@ app.post("/api/change-images-post", uploadPostImages.array("files"), async funct
         connection.query('INSERT INTO BBY_15_Post_Images (post_id, image_location) VALUES (?, ?)',
             [postID, newpath],
             function (error, results, fields) {
+                connection.release();
                 res.send({
                     status: "success",
                     msg: "Image information added to database."
@@ -1102,6 +1129,7 @@ app.post('/api/delete-image', function (req, res) {
     connection.query('DELETE FROM BBY_15_Post_Images WHERE image_location=?',
         [req.body.image],
         function (error, results, fields) {
+            connection.release();
             if (error) {
                 console.log(error);
             }
